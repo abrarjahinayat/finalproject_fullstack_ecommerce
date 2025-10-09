@@ -6,6 +6,7 @@ const errorHandlingMiddleware = require('./src/utils/errorhandling');
 const pathNotFoundMiddleware = require('./src/utils/pathnotefound');
 const app = express();
 const port = process.env.PORT || 3000;
+const session = require('express-session')
 
 // database connection
  dbconnetcion();
@@ -13,9 +14,23 @@ const port = process.env.PORT || 3000;
 // middleware
 app.use(express.json())
 
+app.use(session({
+  secret: process.env.SECRET_KEY,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}))
 
 // router middleware
 app.use(router)
+
+
+
+
+ app.get('/', (req, res, next) => {
+  console.log(req.session.userinfo);
+  res.send("session text");
+});
 
 // page not found
 app.use(pathNotFoundMiddleware)

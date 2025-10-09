@@ -1,8 +1,9 @@
+const session = require("express-session");
 const userModel = require("../model/signup.model");
 const randomnumber = require("../utils/otp");
 const sendEmail = require("../utils/send_email");
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const bcrypt = require("bcrypt");
+// const jwt = require('jsonwebtoken');
 
 const signupControllers = async (req, res, next) => {
   const otp = randomnumber();
@@ -105,45 +106,67 @@ const loginControllers = async (req, res, next) => {
       message: "invalid email or password",
     });
   } else {
-   bcrypt.compare(password, user.password, function(err, result) {
-    if(result){
+    bcrypt.compare(password, user.password, function (err, result) {
+      if (result) {
+        // let token = jwt.sign({ email: user.email, role: user.role }, process.env.PRIVATE_KEY , { expiresIn: '1h' });
 
-      let token = jwt.sign({ email: user.email, role: user.role }, process.env.PRIVATE_KEY , { expiresIn: '1h' });
+        req.session.cookie.maxAge = 60000;
+        req.session.userinfo = user;
 
-
-      return res.status(200).json({
-        success: true,
-        message: "user login successfully",
-        data: user,
-        token
-      });
-    } else{
-      return res.status(404).json({
-        success: false,
-        message: "invalid email or password",
-      });
-    }
-});
+        return res.status(200).json({
+          success: true,
+          message: "user login successfully",
+          data: user,
+          // token
+        });
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: "invalid email or password",
+        });
+      }
+    });
   }
 };
 
 const allusersControllers = async (req, res, next) => {
-
   let allusers = await userModel.find({}).select("-password");
 
-  try {
-    return res.status(200).json({
-      success: true,
-      message: "all users",
-      data: allusers,
-    });
-  } catch (error) {
-    return res.status(501).json({
-      success: false,
-      message: "Unauthorized",
-    });
-  }
+  console.log(req.session.userinfo);
 
+  try {
+    if(req.session.userinfo){
+
+      if(req.session.userinfo.role === "admin"){
+  
+        return res.status(200).json({
+          success: true,
+          message: "all users",
+          data: allusers,
+        });
+      }else{
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized",
+        });
+      }
+    }else{
+      return res.status(401).json({
+        success: false,
+        message: "Session Expired, Please login again",
+      });
+    }
+  } catch (error) {
+
+   next(error);
+      
+   
+  }
 };
 
-module.exports = { signupControllers, verifyOtpControllers, loginControllers, allusersControllers };
+module.exports = {
+  signupControllers,
+  verifyOtpControllers,
+  loginControllers,
+  allusersControllers,
+};

@@ -10,7 +10,10 @@ const errorHandlingMiddleware = (err, req, res, next) => {
             data: messages,
         });
     } else {
-        next(err);
+        return res.status(500).json({
+            success: false,
+            message: err.message || 'Internal Server Error',
+        });
     }
 }
 
