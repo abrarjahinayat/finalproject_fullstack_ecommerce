@@ -14,12 +14,14 @@ const session = require('express-session')
 // middleware
 app.use(express.json())
 
-app.use(session({
-  secret: process.env.SECRET_KEY,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false }
-}))
+
+// Express Session Middleware
+// app.use(session({
+//   secret: process.env.SECRET_KEY,
+//   resave: false,
+//   saveUninitialized: true,
+//   cookie: { secure: false }
+// }))
 
 // router middleware
 app.use(router)
@@ -27,10 +29,10 @@ app.use(router)
 
 
 
- app.get('/', (req, res, next) => {
-  console.log(req.session.userinfo);
-  res.send("session text");
-});
+//  app.get('/', (req, res, next) => {
+//   console.log(req.session.userinfo);
+//   res.send("session text");
+// });
 
 // page not found
 app.use(pathNotFoundMiddleware)

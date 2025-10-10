@@ -3,7 +3,7 @@ const userModel = require("../model/signup.model");
 const randomnumber = require("../utils/otp");
 const sendEmail = require("../utils/send_email");
 const bcrypt = require("bcrypt");
-// const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const signupControllers = async (req, res, next) => {
   const otp = randomnumber();
@@ -108,16 +108,20 @@ const loginControllers = async (req, res, next) => {
   } else {
     bcrypt.compare(password, user.password, function (err, result) {
       if (result) {
-        // let token = jwt.sign({ email: user.email, role: user.role }, process.env.PRIVATE_KEY , { expiresIn: '1h' });
+        let token = jwt.sign(
+          { email: user.email, role: user.role },
+          process.env.PRIVATE_KEY,
+          { expiresIn: "1h" }
+        );
 
-        req.session.cookie.maxAge = 60000;
-        req.session.userinfo = user;
+        // req.session.cookie.maxAge = 60000;
+        // req.session.userinfo = user;
 
         return res.status(200).json({
           success: true,
           message: "user login successfully",
           data: user,
-          // token
+          token,
         });
       } else {
         return res.status(404).json({
@@ -130,37 +134,17 @@ const loginControllers = async (req, res, next) => {
 };
 
 const allusersControllers = async (req, res, next) => {
-  let allusers = await userModel.find({}).select("-password");
-
-  console.log(req.session.userinfo);
+  // console.log(req.session.userinfo);
 
   try {
-    if(req.session.userinfo){
-
-      if(req.session.userinfo.role === "admin"){
-  
-        return res.status(200).json({
-          success: true,
-          message: "all users",
-          data: allusers,
-        });
-      }else{
-        return res.status(401).json({
-          success: false,
-          message: "Unauthorized",
-        });
-      }
-    }else{
-      return res.status(401).json({
-        success: false,
-        message: "Session Expired, Please login again",
-      });
-    }
+    let allusers = await userModel.find({}).select("-password");
+    return res.status(200).json({
+      success: true,
+      message: "all users",
+      data: allusers,
+    });
   } catch (error) {
-
-   next(error);
-      
-   
+    next(error);
   }
 };
 
