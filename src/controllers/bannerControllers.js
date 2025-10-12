@@ -21,4 +21,18 @@ const addbannerControllers = async (req, res) => {
   }
 };
 
-module.exports = addbannerControllers;
+
+const deletebannerControllers = async (req, res) => {
+  let { id } = req.params;
+  try {
+    let deletedBanner = await bannerModel.findByIdAndDelete(id);
+    if (!deletedBanner) {
+      return res.status(404).json({ success: false, message: "Banner not found" });
+    }
+    return res.status(200).json({ success: true, message: "Banner deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Server Error", error: error.message || error });
+  }
+}
+
+module.exports = {  addbannerControllers, deletebannerControllers };
