@@ -14,6 +14,9 @@ const session = require('express-session')
 // middleware
 app.use(express.json())
 
+// static folder middleware
+app.use(express.static("uploads"));
+
 
 // Express Session Middleware
 // app.use(session({
