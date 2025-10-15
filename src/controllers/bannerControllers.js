@@ -1,9 +1,13 @@
 const bannerModel = require("../model/banner.model");
+const fs = require('fs')
+const path = require ('path')
 
 const addbannerControllers = async (req, res) => {
   let { link } = req.body;
   let {  filename } = req.file;
+
   console.log(filename);
+
   try {
     let banner = await new bannerModel({
       image: `${process.env.SERVER_URL}/${ filename}`,
@@ -23,9 +27,17 @@ const addbannerControllers = async (req, res) => {
 
 
 const deletebannerControllers = async (req, res) => {
-  let { id } = req.params;
+  
   try {
-    let deletedBanner = await bannerModel.findByIdAndDelete(id);
+    let { id } = req.params;
+    let deletedBanner = await bannerModel.findByIdAndDelete({_id:id});
+    let imageurl = deletedBanner.image.split('/') 
+    let filepath = path.join(__dirname, '../../uploads')
+    fs.unlink(`${filepath}/${imageurl[imageurl.length-1]}`,(err)=>{
+      if(err){
+        console.log(err);
+      }
+    })
     if (!deletedBanner) {
       return res.status(404).json({ success: false, message: "Banner not found" });
     }
