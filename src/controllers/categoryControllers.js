@@ -48,4 +48,21 @@ const deletecategoryControllers = async (req, res) => {
   }
 };
 
-module.exports = { addcategoryControllers, deletecategoryControllers };
+// Get All Category Controller
+const getallcategoryControllers = async (req, res) => {
+    try {
+        let allcategory = await categoryModel.find({});
+        return res.status(200).json({
+            success: true,
+            message: "All Category fetched successfully",
+            data: allcategory,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Server Error",
+            error: error.message || error,
+          });
+    }
+}
+module.exports = { addcategoryControllers, deletecategoryControllers, getallcategoryControllers };
