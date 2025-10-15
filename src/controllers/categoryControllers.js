@@ -22,9 +22,7 @@ const addcategoryControllers = async (req, res) => {
       message: "Server Error",
       error: error.message || error,
     });
-    return res
-      .status(500)
-      .json({ message: "Server Error", error: error.message || error });
+    
   }
 };
 
@@ -43,6 +41,7 @@ const deletecategoryControllers = async (req, res) => {
       .json({ success: true, message: "Category deleted successfully" });
   } catch (error) {
     return res.status(500).json({
+      success: false,
       message: "Server Error",
       error: error.message || error,
     });
