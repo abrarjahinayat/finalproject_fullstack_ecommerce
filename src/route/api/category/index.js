@@ -12,6 +12,8 @@ router.post("/addcategory", TokenCheckMiddleware, adminCheckMiddleware, upload.s
 
 // Delete Category Route
 router.delete("/deletecategory/:id", TokenCheckMiddleware, adminCheckMiddleware, deletecategoryControllers );
+
+
 // Get All Category Route1
 router.get("/getallcategory",  getallcategoryControllers);
 

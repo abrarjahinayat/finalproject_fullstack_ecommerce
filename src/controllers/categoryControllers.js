@@ -1,4 +1,6 @@
 const categoryModel = require("../model/category.model");
+const fs = require("fs");
+const path = require("path");
 
 // Add Category Controller
 const addcategoryControllers = async (req, res) => {
@@ -28,9 +30,19 @@ const addcategoryControllers = async (req, res) => {
 
 // Delete Category Controller
 const deletecategoryControllers = async (req, res) => {
+  
   try {
     let { id } = req.params;
+    let categorypath = path.join(__dirname, `../../uploads/`);
     let deletedCategory = await categoryModel.findByIdAndDelete({ _id: id });
+    let imageurl = deletedCategory.image.split("/");
+    fs.unlink(`${categorypath}/${imageurl[imageurl.length - 1]}`, (err) => {
+      if (err) {
+        console.error("Error deleting file:", err);
+      } else {
+        console.log("File deleted successfully");
+      }
+    })
     if (!deletedCategory) {
       return res
         .status(404)
