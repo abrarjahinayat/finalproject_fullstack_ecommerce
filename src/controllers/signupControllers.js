@@ -111,7 +111,7 @@ const loginControllers = async (req, res, next) => {
         let token = jwt.sign(
           { email: user.email, role: user.role },
           process.env.PRIVATE_KEY,
-          { expiresIn: "1h" }
+          { expiresIn: "3h" }
         );
 
         // req.session.cookie.maxAge = 60000;
