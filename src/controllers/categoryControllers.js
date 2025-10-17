@@ -1,4 +1,5 @@
 const categoryModel = require("../model/category.model");
+const slugify = require("slugify");
 const fs = require("fs");
 const path = require("path");
 
@@ -8,9 +9,17 @@ const addcategoryControllers = async (req, res) => {
     let { filename } = req.file;
     let { name } = req.body;
 
+    let slug = slugify(name, {
+      replacement: "-",
+      remove: undefined,
+      lower: true,
+      trim: true,
+    });
+
     let addcategory = await new categoryModel({
       image: `${process.env.SERVER_URL}/${filename}`,
       name,
+      slug,
     });
     await addcategory.save();
     return res.status(201).json({
@@ -24,13 +33,11 @@ const addcategoryControllers = async (req, res) => {
       message: "Server Error",
       error: error.message || error,
     });
-    
   }
 };
 
 // Delete Category Controller
 const deletecategoryControllers = async (req, res) => {
-  
   try {
     let { id } = req.params;
     let categorypath = path.join(__dirname, `../../uploads/`);
@@ -42,11 +49,11 @@ const deletecategoryControllers = async (req, res) => {
       } else {
         console.log("File deleted successfully");
       }
-    })
+    });
     if (!deletedCategory) {
       return res
         .status(404)
-        .json({ success: false, message: "Category not found" });
+        .json({ success: false, message: "Category id not found" });
     }
     return res
       .status(200)
@@ -60,21 +67,84 @@ const deletecategoryControllers = async (req, res) => {
   }
 };
 
+
+// Update Category Controller
+const updatecategoryControllers = async (req, res) => {
+  try {
+    let { id } = req.params;
+    let { filename } = req.file;
+    let { name } = req.body;
+
+    let slug = slugify(name, {
+      replacement: "-",
+      remove: undefined,
+      lower: true,
+      trim: true,
+    });
+
+    if (!name || !filename) {
+      return res.status(404).json({
+        success: false,
+        message: "Please provide name or image to update",
+      });
+    } else {
+      let findcategory = await categoryModel.findOne({ _id: id });
+      if (findcategory) {
+        // old image path delete
+        let imageurl = findcategory.image.split("/");
+        let filepath = path.join(__dirname, "../../uploads");
+        fs.unlink(`${filepath}/${imageurl[imageurl.length - 1]}`, (err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+        // updated image into database
+        (findcategory.image = `${process.env.SERVER_URL}/${filename}`),
+          (findcategory.name = name),
+          (findcategory.slug = slug),
+          await findcategory.save();
+        return res.status(200).json({
+          success: true,
+          message: "Category updated successfully",
+          data: findcategory,
+        });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "Category not found" });
+      }
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+};
+
 // Get All Category Controller
 const getallcategoryControllers = async (req, res) => {
-    try {
-        let allcategory = await categoryModel.find({});
-        return res.status(200).json({
-            success: true,
-            message: "All Category fetched successfully",
-            data: allcategory,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Server Error",
-            error: error.message || error,
-          });
-    }
-}
-module.exports = { addcategoryControllers, deletecategoryControllers, getallcategoryControllers };
+  try {
+    let allcategory = await categoryModel.find({});
+    return res.status(200).json({
+      success: true,
+      message: "All Category fetched successfully",
+      data: allcategory,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+};
+
+
+module.exports = {
+  addcategoryControllers,
+  deletecategoryControllers,
+  getallcategoryControllers,
+  updatecategoryControllers,
+};
