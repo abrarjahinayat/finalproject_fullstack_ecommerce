@@ -1,7 +1,7 @@
 const slugify = require("slugify");
 const subcategoryModel = require("../model/subcategory.model");
 const categoryModel = require("../model/category.model");
-const subCategoryControllers = async (req, res) => {
+const addsubCategoryControllers = async (req, res) => {
   try {
     let { name, category } = req.body;
 
@@ -40,4 +40,35 @@ const subCategoryControllers = async (req, res) => {
   }
 };
 
-module.exports = { subCategoryControllers };
+const deletesubCategoryControllers = async (req, res) => {
+  try {
+
+    let { id } = req.params;
+
+    let deletedSubCategory = await subcategoryModel.findByIdAndDelete({ _id: id });
+
+    let updatecategory = await categoryModel.findOneAndUpdate(
+      {subcategory: id },
+      { $pull: { subcategory: id} }
+    );
+    // await updatecategory.save();
+
+    if (!deletedSubCategory) {
+      return res
+        .status(404)
+        .json({ success: false, message: "SubCategory id not found" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, message: "SubCategory deleted successfully" });
+    
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+}
+
+module.exports = { addsubCategoryControllers, deletesubCategoryControllers };

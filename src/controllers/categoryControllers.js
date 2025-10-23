@@ -126,7 +126,10 @@ const updatecategoryControllers = async (req, res) => {
 // Get All Category Controller
 const getallcategoryControllers = async (req, res) => {
   try {
-    let allcategory = await categoryModel.find({});
+    let allcategory = await categoryModel.find({}).populate({
+      path: "subcategory",
+      select : "name slug",
+    });
     return res.status(200).json({
       success: true,
       message: "All Category fetched successfully",
