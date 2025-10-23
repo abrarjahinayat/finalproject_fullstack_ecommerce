@@ -71,4 +71,38 @@ const deletesubCategoryControllers = async (req, res) => {
   }
 }
 
-module.exports = { addsubCategoryControllers, deletesubCategoryControllers };
+const subCategoryControllers = async (req, res) => {
+  try {
+    let { id } = req.params;
+    let{name}=req.body;
+
+    let slug = slugify(name, {
+      replacement: "-",
+      remove: undefined,
+      lower: true,
+      trim: true,
+    });
+
+    let updatesubcategory = await subcategoryModel.findOneAndUpdate(
+      { _id: id },
+      { name, slug },
+      { new: true }
+    );
+    if (!updatesubcategory) {
+      return res
+        .status(404)
+        .json({ success: false, message: "SubCategory id not found" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, message: "SubCategory updated successfully" });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+}
+
+module.exports = { addsubCategoryControllers, deletesubCategoryControllers, subCategoryControllers };
