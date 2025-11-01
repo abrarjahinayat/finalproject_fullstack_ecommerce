@@ -6,12 +6,14 @@ const productSchema = new mongoose.Schema(
       required: [true, "title is required"],
       unique: true,
     },
-    image: {
-      type: String,
-      required: [true, "image is required"],
-    },
-    slug:{
+    image: [
+      {
         type: String,
+        required: [true, "image is required"],
+      },
+    ],
+    slug: {
+      type: String,
     },
     description: {
       type: String,
@@ -30,24 +32,23 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    rating:{
-        type: Number,
+    rating: {
+      type: Number,
     },
-    revires:[{
-        type: string,
-    }],
+    reviews: [
+      {
+        type: String,
+      },
+    ],
     variantType: {
       type: String,
       enum: ["SingleVarient", "MultiVarient"],
       default: "none",
     },
 
-    variants:[
-        { type: mongoose.Types.ObjectId, ref: "Variant" }
-    ]
-  
+    variants: [{ type: mongoose.Types.ObjectId, ref: "Variant" }],
   },
-  { timestamps: true } 
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Products", productSchema);
