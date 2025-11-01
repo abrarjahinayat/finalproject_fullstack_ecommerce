@@ -10,13 +10,13 @@ const addproductControllers = async (req, res) => {
     })
 
 
-    let slug = slugify(title, {
+    let slug = slugify(title, { 
       replacement: "-",
       remove: undefined,
       lower: true,
       trim: true,
     });
-    if (!title || !price || !description || !category || !image) {
+    if (!title || !price || !description || !category || !image || !stock || !variantType) {
       return res.status(400).json({ message: "All fields are required" });
     } else {
       let addproduct = await new productModel({
@@ -49,4 +49,21 @@ const addproductControllers = async (req, res) => {
   }
 };
 
-module.exports = { addproductControllers };
+const getallproductControllers = async (req, res) => {
+  try {
+    let products = await productModel.find({}).populate({path: 'variants', select: 'size stock -_id'});
+    return res.status(200).json({
+      success: true,
+      message: "All Product fetched successfully",
+      data: products,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+};
+
+module.exports = { addproductControllers, getallproductControllers };
