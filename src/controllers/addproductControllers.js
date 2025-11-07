@@ -1,5 +1,7 @@
 const slugify = require("slugify");
 const productModel = require("../model/product.model");
+const fs = require("fs");
+const path = require("path");
 const addproductControllers = async (req, res) => {
  try {
     let { title, price, description, category, stock, discountprice, reviews, rating, variantType, variants } = req.body;
@@ -68,7 +70,7 @@ const getallproductControllers = async (req, res) => {
 
 const getleastproductControllers = async (req, res) => {
   try {
-    let products = await productModel.find({}).populate({path: 'variants', select: 'size color stock -_id'}).sort({ createdAt:-1 }).limit(1);
+    let products = await productModel.find({}).populate({path: 'variants', select: 'size color stock -_id'}).sort({ createdAt:-1 }).limit(5);
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",
@@ -83,4 +85,40 @@ const getleastproductControllers = async (req, res) => {
   }
 }
 
-module.exports = { addproductControllers, getallproductControllers, getleastproductControllers };
+
+const deleteproductControllers = async (req, res) => {
+  try {
+
+    let { id } = req.params;
+
+    let findproduct = await productModel.findById(id);
+
+     findproduct.image.forEach((imgPath)=>{
+      const filename = imgPath.split('/').pop();
+      const filepath = path.join(__dirname, "../../uploads", filename);
+      fs.unlink(filepath, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+        } else {
+          console.log("File deleted successfully");
+        }
+      });
+     }) 
+
+    await productModel.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Product deleted successfully",
+    });
+    
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+}
+
+module.exports = { addproductControllers, getallproductControllers, getleastproductControllers, deleteproductControllers };
