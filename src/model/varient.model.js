@@ -9,6 +9,9 @@ const variantSchema = new mongoose.Schema(
         type: String,
         
     },
+    color:{
+        type: String,
+    },
     stock: {
         type: Number,
     },

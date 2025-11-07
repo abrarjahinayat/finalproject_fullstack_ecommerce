@@ -6,15 +6,16 @@ const addvarientControllers = async (req, res) => {
 
     try {
 
-        let { product, size, stock } = req.body;
+        let { product, size, stock , color } = req.body;
 
-        if (!product || !size || !stock) {
+        if (!product || !stock) {
             return res.status(400).json({ message: "All fields are required" });
           } else {
             let addvarient = await new varientModel({
               product,
               size,
               stock,
+              color
             });
             addvarient.save();
 

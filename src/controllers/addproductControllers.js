@@ -51,7 +51,7 @@ const addproductControllers = async (req, res) => {
 
 const getallproductControllers = async (req, res) => {
   try {
-    let products = await productModel.find({}).populate({path: 'variants', select: 'size stock -_id'});
+    let products = await productModel.find({}).populate({path: 'variants', select: 'size color stock -_id'});
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",
@@ -66,4 +66,21 @@ const getallproductControllers = async (req, res) => {
   }
 };
 
-module.exports = { addproductControllers, getallproductControllers };
+const getleastproductControllers = async (req, res) => {
+  try {
+    let products = await productModel.find({}).populate({path: 'variants', select: 'size color stock -_id'}).sort({ createdAt:-1 }).limit(1);
+    return res.status(200).json({
+      success: true,
+      message: "All Product fetched successfully",
+      data: products,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+}
+
+module.exports = { addproductControllers, getallproductControllers, getleastproductControllers };
