@@ -20,7 +20,7 @@ const productSchema = new mongoose.Schema(
       required: [true, "description is required"],
     },
     price: {
-      type: String,
+      type: Number,
       required: [true, "price is required"],
     },
     category: { type: mongoose.Types.ObjectId, ref: "Category" },
@@ -29,7 +29,7 @@ const productSchema = new mongoose.Schema(
       required: [true, "stock is required"],
     },
     discountprice: {
-      type: String,
+      type: Number,
       default: 0,
     },
     rating: {
