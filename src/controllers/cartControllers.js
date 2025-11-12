@@ -96,14 +96,15 @@ const getcartControllers = async (req, res) => {
 
 const getSinglecartControllers = async (req, res) => {
   try {
-
-
-
     let { id } = req.params;
-    let singlecartData = await cartModel.find({ user: id }).select("-user  -createdAt -updatedAt").populate({
+    let singlecartData = await cartModel
+      .find({ user: id })
+      .select("-user  -createdAt -updatedAt")
+      .populate({
         path: "product",
         select: "title image price discountprice -_id",
-      }).populate({
+      })
+      .populate({
         path: "variants",
         select: "size color -_id",
       });
@@ -121,8 +122,40 @@ const getSinglecartControllers = async (req, res) => {
   }
 };
 
+const updatecartControllers = async (req, res) => {
+  try {
+    let { id } = req.params;
+    let { quantity } = req.body;
+
+    let productinfoData = await productModel.findOne({ _id: id });
+    
+    let totalPrice =
+      productinfoData.discountprice > 0
+        ? productinfoData.discountprice * quantity
+        : productinfoData.price * quantity;
+    let productinfo = await cartModel.findOneAndUpdate(
+      { product: id },
+      { quantity, totalPrice },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Cart updated successfully",
+      data: productinfo,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      massage: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addtocartControllers,
   getcartControllers,
   getSinglecartControllers,
+  updatecartControllers,
 };
