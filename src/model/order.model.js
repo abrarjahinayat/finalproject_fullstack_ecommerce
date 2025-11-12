@@ -28,13 +28,14 @@ const orderSchema = new mongoose.Schema(
         enum:["cod","online"],
         default:"cod",
     },
-    status:{
+    orderstatus:{
         type: String,
         enum:["pending","confirmed","delivered"],
         default:"pending",
     },
-    items:{
-        product:{
+    items:[
+        {
+             product:{
             type: mongoose.Types.ObjectId,
             ref: "Products",
         },
@@ -46,7 +47,8 @@ const orderSchema = new mongoose.Schema(
             type: Number,
             default:1
         }
-    },
+        }
+    ],
     discount:{
         type: Number,
         default:0

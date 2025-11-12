@@ -8,6 +8,7 @@ const products = require('./products');
 const variant = require('./varient');
 const coupon = require('./coupon');
 const cart = require('./cart');
+const order = require('./order');
 
 router.use('/auth', auth);
 router.use('/banner', banner);
@@ -17,5 +18,6 @@ router.use('/products', products);
 router.use('/variant', variant);
 router.use('/coupon', coupon);
 router.use('/cart', cart);
+router.use('/order', order);
 
 module.exports = router;
