@@ -60,6 +60,11 @@ const orderSchema = new mongoose.Schema(
 transactionId:{
     type: String
 },
+paid:{
+    type: String,
+    enum:["paid","unpaid"],
+    default:"unpaid",
+}
   },
   
   { timestamps: true }
