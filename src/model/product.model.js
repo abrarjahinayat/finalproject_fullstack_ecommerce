@@ -21,7 +21,10 @@ const productSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      required: [true, "price is required"],
+    },
+    originalPrice:{
+      type: Number,
+
     },
     category: { type: mongoose.Types.ObjectId, ref: "Category" },
     stock: {

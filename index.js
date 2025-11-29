@@ -4,10 +4,11 @@ const dbconnetcion = require('./src/config/dbconfig');
 const router = require('./src/route');
 const errorHandlingMiddleware = require('./src/utils/errorhandling');
 const pathNotFoundMiddleware = require('./src/utils/pathnotefound');
-const app = express();
+const cors = require('cors')
+const app = express()
 const port = process.env.PORT || 3000;
 const session = require('express-session')
-
+app.use(cors())
 // database connection
  dbconnetcion();
 

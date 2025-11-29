@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const addproductControllers = async (req, res) => {
  try {
-    let { title, price, description, category, stock, discountprice, reviews, rating, variantType, variants } = req.body;
+    let { title, price, description, category, stock, discountprice, reviews, rating, variantType, variants , originalPrice } = req.body;
     let image = req.files;
 
     const imagePaths = req.files.map((item)=> {
@@ -18,7 +18,7 @@ const addproductControllers = async (req, res) => {
       lower: true,
       trim: true,
     });
-    if (!title || !price || !description || !category || !image || !stock || !variantType) {
+    if (!title  || !description || !category || !image || !stock || !variantType) {
       return res.status(400).json({ message: "All fields are required" });
     } else {
       let addproduct = await new productModel({
@@ -34,6 +34,7 @@ const addproductControllers = async (req, res) => {
         rating,
         variantType,
         variants,
+        originalPrice,
       });
       await addproduct.save();
       return res.status(201).json({
