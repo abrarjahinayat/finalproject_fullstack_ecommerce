@@ -122,4 +122,23 @@ const deleteproductControllers = async (req, res) => {
   }
 }
 
-module.exports = { addproductControllers, getallproductControllers, getleastproductControllers, deleteproductControllers };
+const getproductbyslugControllers = async (req, res) => {
+  try {
+      let { slug } = req.params;
+       let products = await productModel.findOne({slug}).populate({path: 'variants', select: 'size color stock -_id'}).sort({ createdAt:-1 }).limit(5);
+    return res.status(200).json({
+      success: true,
+      message: "All Product fetched successfully",
+      data: products,
+    });
+    
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+}
+
+module.exports = { addproductControllers, getallproductControllers, getleastproductControllers, deleteproductControllers ,getproductbyslugControllers}; 
