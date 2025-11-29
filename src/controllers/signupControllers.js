@@ -148,9 +148,39 @@ const allusersControllers = async (req, res, next) => {
   }
 };
 
+const verifyUserControllers = async (req, res, next) => {
+     let {token} = req.headers;
+     
+       jwt.verify(token, process.env.PRIVATE_KEY, function(err, decoded) {
+         if(err){
+           return res.status(401).json({
+             success: false,
+             message: err.message,
+           });
+         } else{
+            userModel.findOne({email: decoded.email}).then((user)=>{
+               return res.status(200).json({
+                 success: true,
+                 message: "user verified successfully",
+                 data: user,
+               });
+            }).catch((err)=>{
+              return res.status(401).json({
+                success: false,
+                message: err.message,
+              });
+            })
+          
+         }
+     });
+
+
+}
+
 module.exports = {
   signupControllers,
   verifyOtpControllers,
   loginControllers,
   allusersControllers,
+  verifyUserControllers
 };
