@@ -54,7 +54,7 @@ const addproductControllers = async (req, res) => {
 
 const getallproductControllers = async (req, res) => {
   try {
-    let products = await productModel.find({}).populate({path: 'variants', select: 'size color stock -_id'});
+    let products = await productModel.find({}).populate({path: 'variants', select: 'size color stock _id'});
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",
@@ -125,7 +125,7 @@ const deleteproductControllers = async (req, res) => {
 const getproductbyslugControllers = async (req, res) => {
   try {
       let { slug } = req.params;
-       let products = await productModel.findOne({slug}).populate({path: 'variants', select: 'size color stock -_id'}).sort({ createdAt:-1 }).limit(5);
+       let products = await productModel.findOne({slug}).populate({path: 'variants', select: 'size color stock _id'}).sort({ createdAt:-1 }).limit(5);
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",

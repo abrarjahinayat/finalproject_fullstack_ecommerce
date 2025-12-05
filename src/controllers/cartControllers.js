@@ -9,9 +9,9 @@ const addtocartControllers = async (req, res) => {
     let cartinfo = await cartModel.findOne({ product });
 
     let totalPrice =
-      productinfo.discountprice > 0
-        ? productinfo.discountprice * quantity
-        : productinfo.price * quantity;
+      productinfo.price > 0
+        ? productinfo.price * quantity
+        : productinfo.originalPrice * quantity;
 
     if (cartinfo) {
       return res.status(400).json({
@@ -102,11 +102,11 @@ const getSinglecartControllers = async (req, res) => {
       .select("-user  -createdAt -updatedAt")
       .populate({
         path: "product",
-        select: "title image price discountprice -_id",
+        select: "title image price discountprice _id",
       })
       .populate({
         path: "variants",
-        select: "size color -_id",
+        select: "size color _id",
       });
     return res.status(200).json({
       success: true,
@@ -130,9 +130,9 @@ const updatecartControllers = async (req, res) => {
     let productinfoData = await productModel.findOne({ _id: id });
     
     let totalPrice =
-      productinfoData.discountprice > 0
-        ? productinfoData.discountprice * quantity
-        : productinfoData.price * quantity;
+      productinfoData.price > 0
+        ? productinfoData.price * quantity
+        : productinfoData.originalPrice * quantity;
     let productinfo = await cartModel.findOneAndUpdate(
       { product: id },
       { quantity, totalPrice },
@@ -153,9 +153,29 @@ const updatecartControllers = async (req, res) => {
   }
 };
 
+
+const deletecartControllers = async (req, res) => {
+  try {
+    let { id } = req.params;
+    let deletecart = await cartModel.findOneAndDelete({ _id: id });
+    return res.status(200).json({
+      success: true,
+      message: "Cart deleted successfully",
+      data: deletecart,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      massage: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addtocartControllers,
   getcartControllers,
   getSinglecartControllers,
   updatecartControllers,
+  deletecartControllers,
 };
