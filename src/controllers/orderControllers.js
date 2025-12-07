@@ -22,6 +22,7 @@ const ordereControllers = async (req, res) => {
       paymentmethod,
       deliverycharge,
       discount,
+      totalprice
     } = req.body;
 
     // Get all cart items for this user
@@ -36,10 +37,10 @@ const ordereControllers = async (req, res) => {
     }
 
     // total cart price
-    const totalprice = cartlist.reduce(
-      (total, item) => total + item.totalPrice,
-      0
-    );
+    // const totalprice = cartlist.reduce(
+    //   (total, item) => total + item.totalPrice,
+    //   0
+    // );
 
     // COD ORDER
     if (paymentmethod === "cod") {
@@ -271,7 +272,7 @@ const getSingleorderControllers = async (req, res) => {
         path: "items.product",
         select: "title image price discountprice _id",
       })
-      .populate({ path: "items.variants", select: "size color stock _id" });
+      .populate({ path: "items.variants", select: "size color stock _id" }).sort({ createdAt: -1 });
 
     if (!order) {
       return res.status(404).json({
