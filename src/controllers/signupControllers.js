@@ -183,10 +183,133 @@ const verifyUserControllers = async (req, res, next) => {
   });
 };
 
+const forgetPasswordControllers = async (req, res, next) => {
+  try {
+    let { email } = req.body;
+
+    let user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "user not found",
+      });
+    } else {
+      const otp = randomnumber();
+      user.otp = otp;
+      await user.save();
+      sendEmail(email, otp);
+      return res.status(200).json({
+        success: true,
+        message: "otp sent successfully",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+const verifyPasswordOtpControllers = async (req, res, next) => {
+  try {
+    let { email, otp } = req.body;
+
+    let user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "user not found",
+      });
+    } else {
+      if (String(user.otp) === String(otp)) {
+        await user.save();
+          setTimeout(async () => {
+          let otpremove = await userModel.findOneAndUpdate(
+            { email },
+            { otp: null },
+            { new: true }
+          );
+
+          await otpremove
+            .save()
+            .then(() => {
+              console.log("otp removed successfully");
+            })
+            .catch((err) => next(err));
+        }, 60000);
+        return res.status(200).json({
+          success: true,
+          message: "otp verified successfully",
+          
+        });
+
+        return res.redirect("http://localhost:3000/order-success");
+       
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: "Invalid OTP",
+        });
+      }
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+};
+
+const resetPasswordControllers = async (req, res, next) => {
+   try {
+
+    let { email, password } = req.body;
+
+    let user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "user not found",
+      });
+    } else {
+       bcrypt.hash(password, 10, async function(err, hash) {
+        // Store hash in your password DB.
+        let resetpassword = await userModel.findOneAndUpdate(
+         { email },
+         { password: hash },
+         { new: true }
+       )
+       await resetpassword.save();
+   
+       return res.status(200).json({
+         success: true,
+         message: "password reset successfully",
+       });
+    });
+
+    }
+    
+   } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+   }
+}
+
 module.exports = {
   signupControllers,
   verifyOtpControllers,
   loginControllers,
   allusersControllers,
   verifyUserControllers,
+  forgetPasswordControllers,
+  verifyPasswordOtpControllers,
+  resetPasswordControllers
 };
